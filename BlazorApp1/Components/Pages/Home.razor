@@ -1,7 +1,90 @@
-﻿@page "/"
+@page "/"
+<PageTitle>Novus Intelligence — Document Analysis Platform</PageTitle>
 
-<PageTitle>Home</PageTitle>
+<div class="hero">
+    <div class="hero-badge">AI-POWERED LEGAL INTELLIGENCE</div>
+    <h1>Novus Document Intelligence</h1>
+    <p>Upload legal documents. Ask questions in plain English. Get answers in seconds.</p>
+    <a href="/analyze" class="btn btn-gold btn-lg">📄 &nbsp;Analyze a Document →</a>
+</div>
 
-<h1>Hello, world!</h1>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number gold-text">10x</div>
+            <div class="stat-label">Faster than manual review</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number gold-text">∞</div>
+            <div class="stat-label">Pages processed instantly</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number gold-text">AI</div>
+            <div class="stat-label">Azure OpenAI powered</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number gold-text">RAG</div>
+            <div class="stat-label">Retrieval-augmented generation</div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">📤</div>
+            <h5 class="navy-text fw-bold">Upload Any Document</h5>
+            <p class="text-muted mb-2" style="font-size:0.9rem;">Contracts, briefs, discovery documents, depositions — drag and drop to begin analysis.</p>
+            <span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h5 class="navy-text fw-bold">Ask in Plain English</h5>
+            <p class="text-muted mb-2" style="font-size:0.9rem;">"What are the payment terms?" "Who are the parties?" "What are the termination clauses?"</p>
+            <span class="tag">Natural Language</span><span class="tag">Contextual</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h5 class="navy-text fw-bold">Instant Answers</h5>
+            <p class="text-muted mb-2" style="font-size:0.9rem;">Grounded responses pulled directly from your document — not hallucinated, not generic.</p>
+            <span class="tag">Azure AI Search</span><span class="tag">RAG</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">🏗 Technology Stack</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-2"><strong>Frontend</strong></p>
+                <span class="tag">Blazor Server</span><span class="tag">.NET 10</span><span class="tag">C#</span><span class="tag">Bootstrap 5</span>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-2"><strong>Cloud</strong></p>
+                <span class="tag">Azure App Service</span><span class="tag">Azure Blob Storage</span><span class="tag">Azure AI Search</span><span class="tag">Azure OpenAI</span>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-2"><strong>DevOps</strong></p>
+                <span class="tag">GitHub Actions</span><span class="tag">CI/CD on push to main</span>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-2"><strong>Integration</strong></p>
+                <span class="tag">SharePoint Embeddable</span><span class="tag">iframe ready</span>
+            </div>
+        </div>
+    </div>
+</div>

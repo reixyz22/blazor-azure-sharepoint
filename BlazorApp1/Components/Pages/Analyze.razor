@@ -1,0 +1,221 @@
+@page "/analyze"
+<PageTitle>Document Analysis — Novus Intelligence</PageTitle>
+
+<div class="d-flex align-items-center mb-4">
+    <div>
+        <h2 class="navy-text fw-bold mb-1">📄 Document Analysis</h2>
+        <p class="text-muted mb-0">Upload a document and ask questions about its contents.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left: Upload -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">📁 Upload Document</div>
+            <div class="card-body">
+                <div class="upload-zone @(uploadedFileName != null ? "has-file" : "")" @onclick="TriggerFileInput">
+                    @if (uploadedFileName == null)
+                    {
+                        <div style="font-size:2.5rem;">📂</div>
+                        <p class="mb-1 fw-semibold">Click to upload</p>
+                        <p class="text-muted" style="font-size:0.82rem;">PDF, DOCX, TXT supported</p>
+                    }
+                    else
+                    {
+                        <div style="font-size:2.5rem;">✅</div>
+                        <p class="mb-1 fw-semibold navy-text">@uploadedFileName</p>
+                        <p class="text-muted" style="font-size:0.82rem;">Ready for analysis</p>
+                    }
+                </div>
+
+                <InputFile id="fileInput" OnChange="HandleFileUpload" style="display:none" accept=".pdf,.docx,.txt" />
+
+                @if (isIndexing)
+                {
+                    <div class="mt-3 text-center">
+                        <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+                        <span class="ms-2" style="font-size:0.85rem; color:#c9a84c;">Indexing document...</span>
+                    </div>
+                }
+
+                @if (uploadedFileName != null && !isIndexing)
+                {
+                    <div class="mt-3 p-2 rounded" style="background:#f0f7ff; border:1px solid #c9a84c;">
+                        <p class="mb-1" style="font-size:0.8rem; font-weight:600; color:#0f1e3c;">📊 Document Ready</p>
+                        <p class="mb-0 text-muted" style="font-size:0.78rem;">Indexed and ready for Q&A</p>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm mt-2 w-100" @onclick="ClearDocument">
+                        Remove Document
+                    </button>
+                }
+
+                <div class="mt-4">
+                    <p class="mb-2" style="font-size:0.8rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em;">Try asking</p>
+                    @foreach (var suggestion in suggestions)
+                    {
+                        <button class="btn btn-sm w-100 text-start mb-1"
+                                style="background:#f4f6f9; border:1px solid #e5e7eb; font-size:0.82rem; color:#374151;"
+                                @onclick="() => Usesuggestion(suggestion)"
+                                disabled="@(uploadedFileName == null)">
+                            @suggestion
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Chat -->
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>💬 Document Q&A</span>
+                @if (messages.Count > 0)
+                {
+                    <button class="btn btn-sm" style="color:#c9a84c; font-size:0.78rem;" @onclick="ClearChat">Clear chat</button>
+                }
+            </div>
+            <div class="card-body d-flex flex-column" style="gap:1rem;">
+                <div class="chat-container" id="chatContainer">
+                    @if (messages.Count == 0)
+                    {
+                        <div class="text-center" style="margin-top:6rem; color:#9ca3af;">
+                            <div style="font-size:3rem;">⚖</div>
+                            <p class="mt-2">Upload a document to begin analysis</p>
+                        </div>
+                    }
+                    @foreach (var msg in messages)
+                    {
+                        <div class="message @msg.Role">
+                            <div class="message-label">@(msg.Role == "user" ? "You" : "Novus AI")</div>
+                            <div class="message-bubble">@msg.Content</div>
+                        </div>
+                    }
+                    @if (isThinking)
+                    {
+                        <div class="message assistant">
+                            <div class="message-label">Novus AI</div>
+                            <div class="message-bubble">
+                                <div class="typing-indicator">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex gap-2">
+                    <input class="form-control"
+                           placeholder="@(uploadedFileName == null ? "Upload a document first..." : "Ask a question about your document...")"
+                           @bind="currentQuestion"
+                           @bind:event="oninput"
+                           @onkeydown="HandleKeyDown"
+                           disabled="@(uploadedFileName == null || isThinking)" />
+                    <button class="btn btn-primary px-3"
+                            @onclick="AskQuestion"
+                            disabled="@(string.IsNullOrWhiteSpace(currentQuestion) || uploadedFileName == null || isThinking)">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? uploadedFileName;
+    private string currentQuestion = "";
+    private bool isThinking = false;
+    private bool isIndexing = false;
+    private List<ChatMessage> messages = new();
+
+    private string[] suggestions = new[]
+    {
+        "Who are the parties in this agreement?",
+        "What are the payment terms?",
+        "What are the termination clauses?",
+        "Summarize the key obligations",
+        "Are there any liability limitations?"
+    };
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        uploadedFileName = e.File.Name;
+        isIndexing = true;
+        StateHasChanged();
+        await Task.Delay(2200); // simulate indexing
+        isIndexing = false;
+        StateHasChanged();
+    }
+
+    private void TriggerFileInput()
+    {
+        // handled by InputFile component
+    }
+
+    private void ClearDocument()
+    {
+        uploadedFileName = null;
+        messages.Clear();
+    }
+
+    private void ClearChat() => messages.Clear();
+
+    private void Usesuggestion(string s)
+    {
+        currentQuestion = s;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(currentQuestion) && uploadedFileName != null)
+            await AskQuestion();
+    }
+
+    private async Task AskQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(currentQuestion) || uploadedFileName == null) return;
+
+        var q = currentQuestion;
+        currentQuestion = "";
+        messages.Add(new ChatMessage("user", q));
+        isThinking = true;
+        StateHasChanged();
+
+        await Task.Delay(1400 + new Random().Next(600));
+
+        var answer = GenerateMockResponse(q);
+        messages.Add(new ChatMessage("assistant", answer));
+        isThinking = false;
+        StateHasChanged();
+    }
+
+    private string GenerateMockResponse(string question)
+    {
+        var q = question.ToLower();
+        var doc = uploadedFileName ?? "the document";
+
+        if (q.Contains("party") || q.Contains("parties") || q.Contains("who"))
+            return $"Based on my analysis of {doc}, this agreement is between two principal parties: the Service Provider and the Client. The Service Provider is identified in Section 1.1 as the party responsible for delivering services, while the Client is the party commissioning and paying for those services. Both parties are bound by the terms outlined in Section 2 of the agreement.";
+
+        if (q.Contains("payment") || q.Contains("fee") || q.Contains("cost"))
+            return $"The payment terms in {doc} specify a NET 30 payment schedule. Invoices are due within 30 days of receipt. A late payment penalty of 1.5% per month applies to overdue balances. Payment must be made in USD via wire transfer or ACH as detailed in Exhibit B.";
+
+        if (q.Contains("terminat") || q.Contains("cancel") || q.Contains("end"))
+            return $"Section 8 of {doc} outlines termination provisions. Either party may terminate with 30 days written notice. Immediate termination is permitted in cases of material breach, insolvency, or failure to cure a default within 10 business days of written notice. Upon termination, all outstanding fees become immediately due.";
+
+        if (q.Contains("liabilit") || q.Contains("limit") || q.Contains("cap"))
+            return $"The liability provisions in {doc} (Section 11) cap total liability at the fees paid in the preceding 12-month period. Consequential, incidental, and punitive damages are explicitly excluded. This limitation does not apply to indemnification obligations or breaches of confidentiality.";
+
+        if (q.Contains("summar") || q.Contains("overview") || q.Contains("key") || q.Contains("obligation"))
+            return $"Here is a summary of the key obligations in {doc}:\n\n• Service Provider: Deliver services per the Statement of Work, maintain confidentiality, and provide monthly status reports.\n• Client: Pay invoices on time, provide necessary access and cooperation, and designate a project manager.\n• Both parties: Comply with applicable law and maintain appropriate insurance coverage throughout the term.";
+
+        if (q.Contains("confiden") || q.Contains("nda") || q.Contains("secret"))
+            return $"Section 9 of {doc} establishes mutual confidentiality obligations. Both parties agree not to disclose the other party's Confidential Information for a period of 3 years following termination. Confidential Information excludes information already in the public domain or independently developed without reference to disclosed materials.";
+
+        return $"Based on my analysis of {doc}, I found relevant provisions addressing your question. The document indicates that this matter is governed by the terms outlined in the applicable sections. The key considerations are the obligations of both parties, the timelines specified, and any conditions precedent that must be satisfied. For a more precise answer, you may want to reference the specific section numbers cited in the document index.";
+    }
+
+    private record ChatMessage(string Role, string Content);
+}
