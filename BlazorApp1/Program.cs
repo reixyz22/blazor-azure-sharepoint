@@ -19,6 +19,14 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+// Allow SharePoint to embed this app in an iframe
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Content-Security-Policy"] =
+        "frame-ancestors 'self' https://*.sharepoint.com";
+    await next();
+});
+
 app.UseAntiforgery();
 
 app.MapStaticAssets();
