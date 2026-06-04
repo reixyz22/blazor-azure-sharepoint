@@ -24,6 +24,8 @@ app.Use(async (context, next) =>
 {
     context.Response.Headers["Content-Security-Policy"] =
         "frame-ancestors 'self' https://*.sharepoint.com";
+    // Remove X-Frame-Options — it overrides CSP frame-ancestors in some browsers
+    context.Response.Headers.Remove("X-Frame-Options");
     await next();
 });
 

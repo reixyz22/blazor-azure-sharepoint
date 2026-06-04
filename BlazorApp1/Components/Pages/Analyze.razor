@@ -14,20 +14,22 @@
         <div class="card h-100">
             <div class="card-header">📁 Upload Document</div>
             <div class="card-body">
-                <div class="upload-zone @(uploadedFileName != null ? "has-file" : "")" @onclick="TriggerFileInput">
-                    @if (uploadedFileName == null)
-                    {
-                        <div style="font-size:2.5rem;">📂</div>
-                        <p class="mb-1 fw-semibold">Click to upload</p>
-                        <p class="text-muted" style="font-size:0.82rem;">PDF, DOCX, TXT supported</p>
-                    }
-                    else
-                    {
-                        <div style="font-size:2.5rem;">✅</div>
-                        <p class="mb-1 fw-semibold navy-text">@uploadedFileName</p>
-                        <p class="text-muted" style="font-size:0.82rem;">Ready for analysis</p>
-                    }
-                </div>
+                <label for="fileInput" style="cursor:pointer; display:block;">
+                    <div class="upload-zone @(uploadedFileName != null ? "has-file" : "")">
+                        @if (uploadedFileName == null)
+                        {
+                            <div style="font-size:2.5rem;">📂</div>
+                            <p class="mb-1 fw-semibold">Click to upload</p>
+                            <p class="text-muted" style="font-size:0.82rem;">PDF, DOCX, TXT supported</p>
+                        }
+                        else
+                        {
+                            <div style="font-size:2.5rem;">✅</div>
+                            <p class="mb-1 fw-semibold navy-text">@uploadedFileName</p>
+                            <p class="text-muted" style="font-size:0.82rem;">Ready for analysis</p>
+                        }
+                    </div>
+                </label>
 
                 <InputFile id="fileInput" OnChange="HandleFileUpload" style="display:none" accept=".pdf,.docx,.txt" />
 
@@ -147,11 +149,6 @@
         await Task.Delay(2200); // simulate indexing
         isIndexing = false;
         StateHasChanged();
-    }
-
-    private void TriggerFileInput()
-    {
-        // handled by InputFile component
     }
 
     private void ClearDocument()
