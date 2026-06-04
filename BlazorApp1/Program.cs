@@ -2,7 +2,13 @@ using BlazorApp1.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Allow Blazor Server to work inside cross-origin iframes (SharePoint)
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
