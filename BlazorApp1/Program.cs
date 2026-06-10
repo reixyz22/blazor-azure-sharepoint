@@ -25,13 +25,18 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
-// Allow SharePoint to embed this app in an iframe
+// Allow SharePoint to embed this app in an iframe.
+// OnStarting fires just before headers are sent — AFTER Blazor and ASP.NET Core
+// have added their own CSP/X-Frame-Options. Setting here guarantees ours wins.
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["Content-Security-Policy"] =
-        "frame-ancestors 'self' https://*.sharepoint.com";
-    // Remove X-Frame-Options — it overrides CSP frame-ancestors in some browsers
-    context.Response.Headers.Remove("X-Frame-Options");
+    context.Response.OnStarting(() =>
+    {
+        context.Response.Headers["Content-Security-Policy"] =
+            "frame-ancestors 'self' https://*.sharepoint.com";
+        context.Response.Headers.Remove("X-Frame-Options");
+        return Task.CompletedTask;
+    });
     await next();
 });
 
